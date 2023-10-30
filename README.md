@@ -77,7 +77,26 @@ Follow these steps to integrate Pepersistence into your project:
    persistenceManager.Register(levelsDataManager);
    ...
    ````
-   Alternatively, if you use dependency injection (DI) in your project, you can register the necessary objects inside your PersistenceManager after resolving dependencies.
+   **Alternatively**, if you use dependency injection (DI) in your project, you can register the necessary objects inside your PersistenceManager:
+
+   ````c#
+   public class PersistenceManager : BasePersistenceManager<SaveData>
+    {
+        public PersistenceManager(ISaveSource saveSource, IReadOnlyList<ISavable> savableObjects) : base(saveSource)
+        {
+            foreach (var savableObject in savableObjects)
+            {
+                Register(savableObject);
+            }
+        }
+    }
+   ````
+   Where `LevelsDataManager` implements `ISavable` instead of `ISavable<GameSaveData>`:
+
+   ````c#
+   public interface ISavable : ISavable<SaveData> { }
+   ````
+
 6. Load/save your game data
    ````c#
    ...
