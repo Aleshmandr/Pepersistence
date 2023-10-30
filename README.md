@@ -16,6 +16,10 @@ You can install Pepersistence in one of the following ways:
 
 Alternatively, you can download the source files directly from the [Pepersistence GitHub repository](https://github.com/Aleshmandr/Pepersistence) and import them into your Unity project manually.
 
+**Package dependencies**:
+
+This package depends on Json.NET by Newtonsoft (`com.unity.nuget.newtonsoft-json` version `3.1.2`)
+
 ## How to use
 
 Follow these steps to integrate Pepersistence into your project:
