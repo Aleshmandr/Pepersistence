@@ -86,7 +86,7 @@ Follow these steps to integrate Pepersistence into your project:
    persistenceManager.Save();
    ````
 
-7. You can delete all save files in the editor by selecting the `Edit-> Clear All Pepersistence Saves`.
+7. You can delete all save files in the editor by selecting the `Edit > Pepersistence > Clear All Saves`.
    This action will remove all files with an extension that matches the pattern `^.*sav$`, including the default `.bsav` (binary save files) and `.jsav` (JSON save files). 
    Therefore, if you create your own save file format, make sure to use a file extension that matches this pattern, as it will also be removed when clearing saves.
 

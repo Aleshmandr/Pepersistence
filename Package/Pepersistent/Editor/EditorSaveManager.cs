@@ -10,7 +10,13 @@ namespace Pepersistence.Editor
     {
         private const string SaveFilesFilter = @"^.*sav$";
 
-        [MenuItem("Edit/Clear All Pepersistence Saves")]
+        [MenuItem("Edit/Pepersistence/Open Persistent Data Path")]
+        public static void OpenPersistentDataPath()
+        {
+            EditorUtility.RevealInFinder(Application.persistentDataPath);
+        }
+
+        [MenuItem("Edit/Pepersistence/Clear All Saves")]
         public static void ClearLocalSavedData()
         {
             // Get the path to the persistent data directory
