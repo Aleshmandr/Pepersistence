@@ -1,0 +1,16 @@
+{
+  "name": "com.aleshmandr.pepersistent",
+  "version": "1.0.0",
+  "displayName": "Pepersistent",
+  "description": "Extendable save/load system for Unity",
+  "unity": "2019.4",
+  "license": "MIT",
+  "dependencies":
+  {
+    "com.unity.nuget.newtonsoft-json" : "3.2.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Aleshmandr/Pepersistence.git"
+  }
+}
