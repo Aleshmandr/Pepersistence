@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pepersistance
+namespace Pepersistence
 {
     [Serializable]
     public class SaveObject

@@ -1,6 +1,6 @@
 # Pepersistence
 
-Extensible save/load system package for Unity engine, designed to simplify the management of game data persistence.
+Extensible save/load system package for Unity game engine, designed to simplify the management of game data persistence.
 
 ## Installation
 You can install Pepersistence in one of the following ways:
@@ -82,11 +82,14 @@ Follow these steps to integrate Pepersistence into your project:
    persistenceManager.Save();
    ````
 
+7. You can delete all save files in the editor by selecting the `Edit-> Clear All Pepersistence Saves`.
+   This action will remove all files with an extension that matches the pattern `^.*sav$`, including the default `.bsav` (binary save files) and `.jsav` (JSON save files). 
+   Therefore, if you create your own save file format, make sure to use a file extension that matches this pattern, as it will also be removed when clearing saves.
+
 ## Features
 
 1. Contains classes for local saves, supporting both binary and JSON formats.
 2. Extensibility: You can implement your custom save source, such as cloud-based saves, to meet your specific needs.
 
 ## TODO
-1. Clear saves in Editor
-2. Migrations support
+1. Migrations support

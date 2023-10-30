@@ -3,7 +3,7 @@ using System.IO;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace Pepersistance
+namespace Pepersistence
 {
     public static class JsonSaveFileManager
     {
