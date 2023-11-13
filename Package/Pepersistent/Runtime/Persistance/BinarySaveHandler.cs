@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Pepersistence
 {
-    public static class BinarySaveFileManager
+    public static class BinarySaveHandler
     {
         private const string SavePathFormat = "{0}/{1}.bsav";
 

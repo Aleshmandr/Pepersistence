@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -68,7 +69,8 @@ namespace Pepersistence
             return new SaveObject
             {
                 Data = JsonConvert.SerializeObject(saveData),
-                Version = version
+                Version = version,
+                Date = DateTime.Now.ToString(CultureInfo.InvariantCulture)
             };
         }
     }

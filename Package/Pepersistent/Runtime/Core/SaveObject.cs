@@ -7,5 +7,6 @@ namespace Pepersistence
     {
         public string Data;
         public string Version;
+        public string Date;
     }
 }

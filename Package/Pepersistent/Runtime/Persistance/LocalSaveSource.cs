@@ -3,22 +3,25 @@
     public class LocalSaveSource : ISaveSource
     {
         private readonly string savePath;
+        private readonly string encryptionKey;
 
-        public LocalSaveSource() : this("save") { }
+        public LocalSaveSource() : this("save", null)
+        {}
 
-        public LocalSaveSource(string savePath)
+        public LocalSaveSource(string savePath, string encryptionKey)
         {
             this.savePath = savePath;
+            this.encryptionKey = encryptionKey;
         }
 
         public SaveObject Load()
         {
-            return JsonSaveFileManager.LoadFromFile<SaveObject>(savePath);
+            return JsonSaveHandler.LoadFromFile<SaveObject>(savePath, encryptionKey);
         }
 
         public void Save(SaveObject save)
         {
-            JsonSaveFileManager.SaveToFile(save, savePath);
+            JsonSaveHandler.SaveToFile(save, savePath, encryptionKey);
         }
     }
 }
