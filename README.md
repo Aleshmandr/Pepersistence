@@ -106,13 +106,14 @@ Follow these steps to integrate Pepersistence into your project:
    ````
 
 7. You can delete all save files in the editor by selecting the `Edit > Pepersistence > Clear All Saves`.
-   This action will remove all files with an extension that matches the pattern `^.*sav$`, including the default `.bsav` (binary save files) and `.jsav` (JSON save files). 
+   This action will remove all files with an extension that matches the pattern `^.*sav$`, including the default `.jsav`. 
    Therefore, if you create your own save file format, make sure to use a file extension that matches this pattern, as it will also be removed when clearing saves.
 
 ## Features
 
 1. Contains classes for local saves, supporting both binary and JSON formats.
 2. Extensibility: You can implement your custom save source, such as cloud-based saves, to meet your specific needs.
+3. Save file encryprion
 
 ## TODO
 1. Migrations support
