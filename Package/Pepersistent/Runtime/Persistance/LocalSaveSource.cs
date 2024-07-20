@@ -1,10 +1,13 @@
-﻿namespace Pepersistence
+﻿using UnityEngine.Scripting;
+
+namespace Pepersistence
 {
     public class LocalSaveSource : ISaveSource
     {
         private readonly string savePath;
         private readonly string encryptionKey;
 
+        [Preserve]
         public LocalSaveSource() : this("save", null)
         {}
 
