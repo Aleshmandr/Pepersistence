@@ -1,7 +1,7 @@
 {
     "name": "Pepersistence.Editor",
     "rootNamespace": "Pepersistence.Editor",
-    "references": [],
+    "references": ["GUID:e16b3ec1b97b00449907c37c7baa8f2b"],
     "includePlatforms": [
         "Editor"
     ],

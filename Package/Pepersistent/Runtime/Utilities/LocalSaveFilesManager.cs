@@ -1,23 +1,15 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using UnityEditor;
 using UnityEngine;
 
-namespace Pepersistence.Editor
+namespace Pepersistence
 {
-    public static class EditorSaveManager
+    public static class LocalSaveFilesManager
     {
         private const string SaveFilesFilter = @"^.*sav$";
 
-        [MenuItem("Edit/Pepersistence/Open Persistent Data Path")]
-        public static void OpenPersistentDataPath()
-        {
-            EditorUtility.RevealInFinder(Application.persistentDataPath);
-        }
-
-        [MenuItem("Edit/Pepersistence/Clear All Saves")]
-        public static void ClearLocalSavedData()
+        public static void DeleteAllSaves()
         {
             // Get the path to the persistent data directory
             string dataPath = Application.persistentDataPath;
