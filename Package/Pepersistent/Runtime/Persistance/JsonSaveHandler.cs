@@ -20,10 +20,16 @@ namespace Pepersistence
                 {
                     json = XorEncryption.EncryptDecrypt(json, encryptionKey);
                 }
+
                 result = JsonConvert.DeserializeObject<T>(json);
-            } catch (Exception e)
+            }
+            catch (FileNotFoundException foundException)
             {
-                Debug.Log(e);
+                Debug.Log(foundException);
+            } 
+            catch (Exception e)
+            {
+                Debug.LogException(e);
             }
 
             return result;
@@ -42,7 +48,7 @@ namespace Pepersistence
                 File.WriteAllText(path, json);
             } catch (Exception e)
             {
-                Debug.Log(e);
+                Debug.LogException(e);
             }
         }
     }
