@@ -30,6 +30,7 @@ namespace Pepersistence
             if (!IsLoaded)
             {
                 Debug.LogWarning("Skip a save. Save method must be called after Load to prevent progress loss.");
+                return;
             }
             
             for (int i = 0; i < savableObjects.Count; i++)
