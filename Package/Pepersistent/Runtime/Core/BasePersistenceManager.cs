@@ -12,6 +12,8 @@ namespace Pepersistence
         private readonly ISaveSource saveSource;
         private T saveData;
 
+        public bool IsLoaded { get; private set; }
+
         public BasePersistenceManager(ISaveSource saveSource)
         {
             this.saveSource = saveSource;
@@ -25,6 +27,11 @@ namespace Pepersistence
 
         public void Save()
         {
+            if (!IsLoaded)
+            {
+                Debug.LogWarning("Skip a save. Save method must be called after Load to prevent progress loss.");
+            }
+            
             for (int i = 0; i < savableObjects.Count; i++)
             {
                 savableObjects[i].Save(ref saveData);
@@ -44,6 +51,8 @@ namespace Pepersistence
             {
                 savableObjects[i].Load(saveData);
             }
+
+            IsLoaded = true;
         }
 
         private void Migrate(SaveObject saveObject)
