@@ -8,6 +8,7 @@ namespace Pepersistence
     public static class JsonSaveHandler
     {
         private const string SavePathFormat = "{0}/{1}.jsav";
+        private const string TempSavePathFormat = "{0}/{1}.jsav.tmp";
 
         public static T LoadFromFile<T>(string fileName, string encryptionKey = null) where T : class
         {
@@ -38,6 +39,7 @@ namespace Pepersistence
         public static void SaveToFile<T>(T data, string fileName, string encryptionKey = null)
         {
             var path = string.Format(SavePathFormat, Application.persistentDataPath, fileName);
+            var tempPath = string.Format(TempSavePathFormat, Application.persistentDataPath, fileName);
             try
             {
                 var json = JsonConvert.SerializeObject(data);
@@ -45,8 +47,18 @@ namespace Pepersistence
                 {
                     json = XorEncryption.EncryptDecrypt(json, encryptionKey);
                 }
-                File.WriteAllText(path, json);
-            } catch (Exception e)
+                
+                // Write to a temporary file first to prevent save corruption if the disk is full
+                File.WriteAllText(tempPath, json);
+                
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+                
+                File.Move(tempPath, path);
+            } 
+            catch (Exception e)
             {
                 Debug.LogException(e);
             }
