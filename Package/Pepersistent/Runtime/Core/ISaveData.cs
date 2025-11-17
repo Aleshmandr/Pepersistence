@@ -1,4 +1,4 @@
 ﻿namespace Pepersistence
 {
-    public interface ISaveData { };
+    public interface ISaveData { }
 }

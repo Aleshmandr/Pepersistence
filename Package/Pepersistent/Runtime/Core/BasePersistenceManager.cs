@@ -10,6 +10,7 @@ namespace Pepersistence
     {
         private readonly List<ISavable<T>> savableObjects;
         private readonly ISaveSource saveSource;
+        private IReadOnlyList<ISaveDataMigration> migrations;
         private T saveData;
 
         public bool IsLoaded { get; private set; }
@@ -25,6 +26,11 @@ namespace Pepersistence
             savableObjects.Add(savable);
         }
 
+        public void InitializeMigration(IReadOnlyList<ISaveDataMigration> migrations)
+        {
+            this.migrations = migrations;
+        }
+
         public void Save()
         {
             if (!IsLoaded)
@@ -32,7 +38,7 @@ namespace Pepersistence
                 Debug.LogWarning("Skip a save. Save method must be called after Load to prevent progress loss.");
                 return;
             }
-            
+
             for (int i = 0; i < savableObjects.Count; i++)
             {
                 savableObjects[i].Save(ref saveData);
@@ -45,7 +51,7 @@ namespace Pepersistence
         public void Load()
         {
             SaveObject saveObject = saveSource.Load();
-            Migrate(saveObject);
+            saveObject = Migrate(saveObject);
             LoadSaveObject(saveObject);
 
             for (int i = 0; i < savableObjects.Count; i++)
@@ -56,9 +62,35 @@ namespace Pepersistence
             IsLoaded = true;
         }
 
-        private void Migrate(SaveObject saveObject)
+        private SaveObject Migrate(SaveObject saveObject)
         {
-            // TODO: Add save migration feature
+            if (migrations == null || saveObject == null || string.IsNullOrEmpty(saveObject.Data))
+            {
+                return saveObject;
+            }
+
+            foreach (var migration in migrations)
+            {
+                try
+                {
+                    Version version = Version.Parse(saveObject.Version);
+                    Version migrateToVersion = Version.Parse(migration.MigrateToVersion);
+                    if (version >= migrateToVersion)
+                    {
+                        continue;
+                    }
+
+                    saveObject.Data = migration.Migrate(saveObject.Data);
+                    saveObject.Version = migration.MigrateToVersion;
+                    Debug.Log($"Migration {version} -> {migrateToVersion} performed");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Migration error {migration}: {e}");
+                }
+            }
+
+            return saveObject;
         }
 
         private void LoadSaveObject(SaveObject saveObject)
@@ -66,7 +98,8 @@ namespace Pepersistence
             try
             {
                 saveData = JsonConvert.DeserializeObject<T>(saveObject.Data);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Debug.Log($"Unable to load a save object, create the new one. ({e.Message})");
                 saveData = new T();
