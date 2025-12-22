@@ -12,6 +12,15 @@ namespace Pepersistence
         private readonly ISaveSource saveSource;
         private IReadOnlyList<ISaveDataMigration> migrations;
         private T saveData;
+        
+        private readonly JsonSerializerSettings serializerSettings = new()
+        {
+            Error = (sender, args) =>
+            {
+                Debug.LogError($"Save load error at path '{args.ErrorContext.Path}': {args.ErrorContext.Error.Message}");
+                args.ErrorContext.Handled = true;
+            }
+        };
 
         public bool IsLoaded { get; private set; }
 
@@ -97,11 +106,16 @@ namespace Pepersistence
         {
             try
             {
-                saveData = JsonConvert.DeserializeObject<T>(saveObject.Data);
+                saveData = JsonConvert.DeserializeObject<T>(saveObject.Data, serializerSettings);
+            }
+            catch (NullReferenceException nullReferenceException)
+            {
+                Debug.Log($"Unable to load a save object, create the new one. ({nullReferenceException.Message})");
+                saveData = new T();
             }
             catch (Exception e)
             {
-                Debug.Log($"Unable to load a save object, create the new one. ({e.Message})");
+                Debug.LogError($"Unable to load a save object, create the new one. ({e.Message})");
                 saveData = new T();
             }
         }
