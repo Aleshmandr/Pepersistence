@@ -8,19 +8,11 @@ namespace Pepersistence
 {
     public abstract class BasePersistenceManager<T> where T : ISaveData, new()
     {
+        protected readonly JsonSerializerSettings SerializerSettings;
         private readonly List<ISavable<T>> savableObjects;
         private readonly ISaveSource saveSource;
         private IReadOnlyList<ISaveDataMigration> migrations;
         private T saveData;
-        
-        private readonly JsonSerializerSettings serializerSettings = new()
-        {
-            Error = (sender, args) =>
-            {
-                Debug.LogError($"Save load error at path '{args.ErrorContext.Path}': {args.ErrorContext.Error.Message}");
-                args.ErrorContext.Handled = true;
-            }
-        };
 
         public bool IsLoaded { get; private set; }
 
@@ -28,6 +20,15 @@ namespace Pepersistence
         {
             this.saveSource = saveSource;
             savableObjects = new List<ISavable<T>>();
+
+            SerializerSettings = new JsonSerializerSettings
+            {
+                Error = (sender, args) =>
+                {
+                    Debug.LogError($"Save load error at path '{args.ErrorContext.Path}': {args.ErrorContext.Error.Message}");
+                    args.ErrorContext.Handled = true;
+                }
+            };
         }
 
         public void Register(ISavable<T> savable)
@@ -106,7 +107,7 @@ namespace Pepersistence
         {
             try
             {
-                saveData = JsonConvert.DeserializeObject<T>(saveObject.Data, serializerSettings);
+                saveData = JsonConvert.DeserializeObject<T>(saveObject.Data, SerializerSettings);
             }
             catch (NullReferenceException nullReferenceException)
             {
@@ -125,7 +126,7 @@ namespace Pepersistence
             string version = Application.version;
             return new SaveObject
             {
-                Data = JsonConvert.SerializeObject(saveData),
+                Data = JsonConvert.SerializeObject(saveData, SerializerSettings),
                 Version = version,
                 Date = DateTime.Now.ToString(CultureInfo.InvariantCulture)
             };
