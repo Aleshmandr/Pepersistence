@@ -12,6 +12,12 @@ namespace Pepersistence
 
         public static void DeleteAllSaves()
         {
+            // Queued background writes are dropped, so they cannot recreate a deleted save.
+            JsonSaveHandler.DiscardPendingWrites(DeleteSaveFiles);
+        }
+
+        private static void DeleteSaveFiles()
+        {
             // Get the path to the persistent data directory
             string dataPath = Application.persistentDataPath;
 

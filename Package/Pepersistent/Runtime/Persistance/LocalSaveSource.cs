@@ -2,7 +2,7 @@
 
 namespace Pepersistence
 {
-    public class LocalSaveSource : ISaveSource
+    public class LocalSaveSource : ISaveSource, IRecoverableSaveSource
     {
         private readonly string savePath;
         private readonly string encryptionKey;
@@ -20,6 +20,11 @@ namespace Pepersistence
         public SaveObject Load()
         {
             return JsonSaveHandler.LoadFromFile<SaveObject>(savePath, encryptionKey);
+        }
+
+        public SaveObject RecoverFromBackup()
+        {
+            return JsonSaveHandler.RecoverFromBackup<SaveObject>(savePath, encryptionKey);
         }
 
         public void Save(SaveObject save)

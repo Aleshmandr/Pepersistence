@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace Pepersistence
@@ -60,9 +61,16 @@ namespace Pepersistence
 
         public void Load()
         {
-            SaveObject saveObject = saveSource.Load();
-            saveObject = Migrate(saveObject);
-            LoadSaveObject(saveObject);
+            if (!TryLoadSaveData(saveSource.Load()))
+            {
+                // A save that exists but cannot be read must not be replaced by new data while a backup can be loaded.
+                var backup = saveSource is IRecoverableSaveSource recoverableSource ? recoverableSource.RecoverFromBackup() : null;
+                if (backup == null || !TryLoadSaveData(backup))
+                {
+                    Debug.LogError("Unable to load a save object, create the new one.");
+                    saveData = new T();
+                }
+            }
 
             for (int i = 0; i < savableObjects.Count; i++)
             {
@@ -103,23 +111,57 @@ namespace Pepersistence
             return saveObject;
         }
 
-        private void LoadSaveObject(SaveObject saveObject)
+        // Returns false when a save exists, but its data cannot be loaded.
+        private bool TryLoadSaveData(SaveObject saveObject)
         {
-            if (saveObject == null || string.IsNullOrEmpty(saveObject.Data))
+            if (saveObject == null)
             {
                 saveData = new T();
-                return;
+                return true;
+            }
+
+            if (string.IsNullOrEmpty(saveObject.Data))
+            {
+                return false;
+            }
+
+            saveObject = Migrate(saveObject);
+            if (!IsWellFormedJson(saveObject.Data))
+            {
+                return false;
             }
 
             try
             {
-                // A "null" payload deserializes to null, but savables always receive a save data instance.
-                saveData = JsonConvert.DeserializeObject<T>(saveObject.Data, SerializerSettings) ?? new T();
+                var data = JsonConvert.DeserializeObject<T>(saveObject.Data, SerializerSettings);
+                if (data == null)
+                {
+                    return false;
+                }
+
+                saveData = data;
+                return true;
             }
             catch (Exception e)
             {
-                Debug.LogError($"Unable to load a save object, create the new one. ({e.Message})");
-                saveData = new T();
+                Debug.LogError($"Unable to load a save object. ({e.Message})");
+                return false;
+            }
+        }
+
+        // The tolerant serializer settings skip member errors and turn truncated JSON into partial data, so the
+        // syntax is validated separately: damaged text must be recovered from a backup, not loaded partially.
+        private static bool IsWellFormedJson(string json)
+        {
+            try
+            {
+                JToken.Parse(json);
+                return true;
+            }
+            catch (JsonReaderException e)
+            {
+                Debug.LogError($"Save data is not valid JSON ({e.Message}).");
+                return false;
             }
         }
 

@@ -116,9 +116,32 @@ Follow these steps to integrate Pepersistence into your project:
 
 - A save is written to `<name>.jsav.tmp` and flushed to the storage before it replaces the save file.
 - The previous save is kept as `<name>.jsav.bak` instead of being deleted, so a complete save file exists at every step.
-- If the save file is missing or cannot be parsed, the backup is loaded instead. A corrupted save file is moved to 
-  `<name>.jsav.corrupt` for investigation, so it can't replace the good backup on the next save.
+- If the save file is missing or cannot be parsed, the backup is loaded instead, then a complete temporary file left by an 
+  interrupted save. A corrupted save file is moved to `<name>.jsav.corrupt` for investigation, so it can't replace the 
+  good backup on the next save.
+- `BasePersistenceManager` also validates the save data inside the file. When it is empty or not valid JSON, the manager 
+  asks a source implementing `IRecoverableSaveSource` (`LocalSaveSource`, `BackgroundLocalSaveSource`) for the backup 
+  before it falls back to new save data.
 - The file format is unchanged, so saves written by older versions load as before.
+
+### Background saves
+
+Flushing a save file to the storage takes several milliseconds, which is noticeable on the main thread of a real-time game.
+Use `BackgroundLocalSaveSource` instead of `LocalSaveSource` to keep it off the main thread:
+
+````c#
+var persistenceManager = new PersistenceManager(new BackgroundLocalSaveSource("save", encryptionKey));
+````
+
+- The save data is serialized on the calling thread; the file is written on a background thread. 
+  Call it from the main thread.
+- A newer save of the same file replaces a queued write that has not started yet, so frequent saves don't pile up.
+- Loads, synchronous saves and `DeleteAllSaves` wait for queued writes of the file, and all file operations are serialized, 
+  so an older save never overwrites a newer one.
+- A failed write is kept and retried by the next save or flush. `JsonSaveHandler.WaitForPendingWrites` returns `false` 
+  while a write keeps failing.
+- On `Application.quitting` queued writes are completed and later saves are written synchronously. 
+  WebGL always writes synchronously.
 
 ## Features
 
