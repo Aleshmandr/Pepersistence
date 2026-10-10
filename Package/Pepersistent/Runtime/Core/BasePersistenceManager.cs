@@ -105,14 +105,16 @@ namespace Pepersistence
 
         private void LoadSaveObject(SaveObject saveObject)
         {
+            if (saveObject == null || string.IsNullOrEmpty(saveObject.Data))
+            {
+                saveData = new T();
+                return;
+            }
+
             try
             {
-                saveData = JsonConvert.DeserializeObject<T>(saveObject.Data, SerializerSettings);
-            }
-            catch (NullReferenceException nullReferenceException)
-            {
-                Debug.Log($"Unable to load a save object, create the new one. ({nullReferenceException.Message})");
-                saveData = new T();
+                // A "null" payload deserializes to null, but savables always receive a save data instance.
+                saveData = JsonConvert.DeserializeObject<T>(saveObject.Data, SerializerSettings) ?? new T();
             }
             catch (Exception e)
             {

@@ -106,8 +106,19 @@ Follow these steps to integrate Pepersistence into your project:
    ````
 
 7. You can delete all save files in the editor by selecting the `Edit > Pepersistence > Clear All Saves`.
-   This action will remove all files with an extension that matches the pattern `^.*sav$`, including the default `.jsav`. 
+   This action will remove all files with an extension that matches the pattern `^.*sav$`, including the default `.jsav`, 
+   together with their `.tmp`, `.bak` and `.corrupt` copies.
    Therefore, if you create your own save file format, make sure to use a file extension that matches this pattern, as it will also be removed when clearing saves.
+
+## Save file safety
+
+`JsonSaveHandler` (used by `LocalSaveSource`) protects local saves from crashes and power loss:
+
+- A save is written to `<name>.jsav.tmp` and flushed to the storage before it replaces the save file.
+- The previous save is kept as `<name>.jsav.bak` instead of being deleted, so a complete save file exists at every step.
+- If the save file is missing or cannot be parsed, the backup is loaded instead. A corrupted save file is moved to 
+  `<name>.jsav.corrupt` for investigation, so it can't replace the good backup on the next save.
+- The file format is unchanged, so saves written by older versions load as before.
 
 ## Features
 
@@ -115,3 +126,4 @@ Follow these steps to integrate Pepersistence into your project:
 2. Extensibility: You can implement your custom save source, such as cloud-based saves, to meet your specific needs.
 3. Save file encryprion
 4. Save data migrations
+5. Crash-safe local saves with an automatic backup

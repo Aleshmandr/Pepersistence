@@ -7,7 +7,8 @@ namespace Pepersistence
 {
     public static class LocalSaveFilesManager
     {
-        private const string SaveFilesFilter = @"^.*sav$";
+        // Includes the temporary, backup and corrupted copies, otherwise a cleared save would be restored from its backup.
+        private const string SaveFilesFilter = @"^.*sav(\.(tmp|bak|corrupt))?$";
 
         public static void DeleteAllSaves()
         {
