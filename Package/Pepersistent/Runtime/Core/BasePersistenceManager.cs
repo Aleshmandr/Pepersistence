@@ -87,6 +87,10 @@ namespace Pepersistence
                 return saveObject;
             }
 
+            // A build older than a migration must not apply it: the save is written back with the build's version, so
+            // the migration would run again on every launch. An unparsable build version keeps the old behavior.
+            Version.TryParse(Application.version, out Version buildVersion);
+
             foreach (var migration in migrations)
             {
                 try
@@ -95,6 +99,12 @@ namespace Pepersistence
                     Version migrateToVersion = Version.Parse(migration.MigrateToVersion);
                     if (version >= migrateToVersion)
                     {
+                        continue;
+                    }
+
+                    if (buildVersion != null && migrateToVersion > buildVersion)
+                    {
+                        Debug.Log($"Migration {version} -> {migrateToVersion} skipped: the build version is {buildVersion}");
                         continue;
                     }
 
